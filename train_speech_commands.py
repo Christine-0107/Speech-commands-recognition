@@ -22,6 +22,8 @@ import models
 from datasets import *
 from transforms import *
 from mixup import *
+import warnings
+warnings.filterwarnings('ignore')
 
 parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument("--train-dataset", type=str, default='datasets/speech_commands/train', help='path of train dataset')
@@ -97,7 +99,7 @@ else:
 start_timestamp = int(time.time()*1000)
 start_epoch = 0
 best_accuracy = 0
-best_loss = 1e100
+best_loss = 1e10
 global_step = 0
 
 if args.resume:
@@ -152,7 +154,7 @@ def train(epoch):
 
         if use_gpu:
             inputs = inputs.cuda()
-            targets = targets.cuda(async=True)
+            targets = targets.cuda(non_blocking=True)   # modified
 
         # forward/backward
         outputs = model(inputs)
@@ -167,15 +169,15 @@ def train(epoch):
         # statistics
         it += 1
         global_step += 1
-        running_loss += loss.data[0]
+        running_loss += loss.data
         pred = outputs.data.max(1, keepdim=True)[1]
         if args.mixup:
             targets = batch['target']
-            targets = Variable(targets, requires_grad=False).cuda(async=True)
+            targets = Variable(targets, requires_grad=False).cuda(non_blocking=True)
         correct += pred.eq(targets.data.view_as(pred)).sum()
         total += targets.size(0)
 
-        writer.add_scalar('%s/loss' % phase, loss.data[0], global_step)
+        writer.add_scalar('%s/loss' % phase, loss.data, global_step)
 
         # update the progress bar
         pbar.set_postfix({
@@ -210,7 +212,7 @@ def valid(epoch):
 
         if use_gpu:
             inputs = inputs.cuda()
-            targets = targets.cuda(async=True)
+            targets = targets.cuda(non_blocking=True)
 
         # forward
         outputs = model(inputs)
@@ -219,12 +221,12 @@ def valid(epoch):
         # statistics
         it += 1
         global_step += 1
-        running_loss += loss.data[0]
+        running_loss += loss.data
         pred = outputs.data.max(1, keepdim=True)[1]
         correct += pred.eq(targets.data.view_as(pred)).sum()
         total += targets.size(0)
 
-        writer.add_scalar('%s/loss' % phase, loss.data[0], global_step)
+        writer.add_scalar('%s/loss' % phase, loss.data, global_step)
 
         # update the progress bar
         pbar.set_postfix({

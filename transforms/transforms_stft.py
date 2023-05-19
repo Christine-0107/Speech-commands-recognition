@@ -23,7 +23,7 @@ class ToSTFT(object):
         sample_rate = data['sample_rate']
         data['n_fft'] = self.n_fft
         data['hop_length'] = self.hop_length
-        data['stft'] = librosa.stft(samples, n_fft=self.n_fft, hop_length=self.hop_length)
+        data['stft'] = librosa.stft(y=samples, n_fft=self.n_fft, hop_length=self.hop_length)
         data['stft_shape'] = data['stft'].shape
         return data
 
