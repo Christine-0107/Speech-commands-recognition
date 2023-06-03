@@ -264,11 +264,13 @@ def valid(epoch):
 
 print("training %s for Google speech commands..." % args.model)
 since = time.time()
+
 for epoch in range(start_epoch, args.max_epochs):
     if args.lr_scheduler == 'step':
         lr_scheduler.step()
 
     train(epoch)
+
     epoch_loss = valid(epoch)
 
     if args.lr_scheduler == 'plateau':

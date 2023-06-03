@@ -94,7 +94,8 @@ def test():
 
         if use_gpu:
             inputs = inputs.cuda()
-            targets = targets.cuda(async=True)
+            # targets = targets.cuda(async=True)
+            targets = targets.cuda(non_blocking=True)
 
         # forward
         outputs = model(inputs)
@@ -111,7 +112,7 @@ def test():
         pred = outputs.data.max(1, keepdim=True)[1]
         correct += pred.eq(targets.data.view_as(pred)).sum()
         total += targets.size(0)
-        confusion_matrix.add(pred, targets.data)
+        #confusion_matrix.add(pred, targets.data)
 
         filenames = batch['path']
         for j in range(len(pred)):
@@ -122,8 +123,8 @@ def test():
     accuracy = correct/total
     #epoch_loss = running_loss / it
     print("accuracy: %f%%" % (100*accuracy))
-    print("confusion matrix:")
-    print(confusion_matrix.value())
+    #print("confusion matrix:")
+    #print(confusion_matrix.value())
 
     return probabilities, predictions
 
