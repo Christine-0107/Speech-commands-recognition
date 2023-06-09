@@ -4,6 +4,7 @@ from .dpn import *
 from .resnet import *
 from .densenet import *
 from .resnext import *
+from .resnet50 import *
 
 available_models = [
     'vgg19_bn',
@@ -17,14 +18,8 @@ available_models = [
 def create_model(model_name, num_classes, in_channels):
     if model_name == "resnet18":
         model = resnet18(num_classes=num_classes, in_channels=in_channels)
-    if model_name == "resnet34":
-        model = resnet34(num_classes=num_classes, in_channels=in_channels)
     elif model_name == "resnet50":
         model = resnet50(num_classes=num_classes, in_channels=in_channels)
-    elif model_name == "resnet101":
-        model = resnet101(num_classes=num_classes, in_channels=in_channels)
-    elif model_name == "resnet152":
-        model = resnet152(num_classes=num_classes, in_channels=in_channels)
     elif model_name == "wideresnet28_10":
         model = WideResNet(depth=28, widen_factor=10, dropRate=0, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "wideresnet28_10D":
