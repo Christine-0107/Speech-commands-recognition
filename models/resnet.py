@@ -8,7 +8,7 @@ https://arxiv.org/abs/1512.03385
 import torch.nn as nn
 import math
 import torch.utils.model_zoo as model_zoo
-from .HigherModels import *
+from models.HigherModels import *
 
 
 __all__ = ['ResNet', 'resnet18', 'resnet34', 'resnet50', 'resnet101',
@@ -103,7 +103,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, in_channels=3):
+    def __init__(self, block, layers, mode, num_classes=1000, in_channels=3):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
@@ -115,17 +115,19 @@ class ResNet(nn.Module):
         self.layer2 = self._make_layer(block, 128, layers[1], stride=2)
         self.layer3 = self._make_layer(block, 256, layers[2], stride=2)
         self.layer4 = self._make_layer(block, 512, layers[3], stride=2)
-        #self.avgpool = nn.AvgPool2d(1, stride=1)
+        self.avgpool = nn.AvgPool2d(1, stride=1)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
+        if mode == 18:
+            dim = 512
         # add attention
         # attention pooling module
         self.attention = Attention(
-            2048,
+            dim,
             num_classes,
             att_activation='sigmoid',
             cla_activation='sigmoid')
-        self.avgpool = nn.AvgPool2d((4, 1))
+        #self.avgpool = nn.AvgPool2d((4, 1))
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -153,8 +155,8 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        batch_size = x.shape[0]
-
+        #batch_size = x.shape[0]
+        print(f"x_shape: {x.shape}")
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -165,11 +167,16 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        x = x.reshape([batch_size, 2048, 4, 33])
+        #x = x.reshape([batch_size, 2048, 4, 33])
+
+        
 
         x = self.avgpool(x)
 
-        x = x.transpose(2,3)
+        #x = x.transpose(2,3)
+        x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
+        x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
+
         x, norm_att = self.attention(x)
 
         x = x.view(x.size(0), -1)
@@ -184,7 +191,7 @@ def resnet18(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(BasicBlock, [2, 2, 2, 2], **kwargs)
+    model = ResNet(BasicBlock, [2, 2, 2, 2], 18, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
     return model
@@ -196,7 +203,7 @@ def resnet34(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(BasicBlock, [3, 4, 6, 3], **kwargs)
+    model = ResNet(BasicBlock, [3, 4, 6, 3], 34, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet34']))
     return model
@@ -208,7 +215,7 @@ def resnet50(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    model = ResNet(Bottleneck, [3, 4, 6, 3], 50, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
     return model
@@ -220,7 +227,7 @@ def resnet101(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 4, 23, 3], **kwargs)
+    model = ResNet(Bottleneck, [3, 4, 23, 3], 101, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet101']))
     return model
@@ -232,7 +239,7 @@ def resnet152(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 8, 36, 3], **kwargs)
+    model = ResNet(Bottleneck, [3, 8, 36, 3], 152, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet152']))
     return model
