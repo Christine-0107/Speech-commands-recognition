@@ -155,7 +155,7 @@ class ResNet(nn.Module):
         return nn.Sequential(*layers)
 
     def forward(self, x):
-        #batch_size = x.shape[0]
+        batch_size = x.shape[0]
         print(f"x_shape: {x.shape}")
         x = self.conv1(x)
         x = self.bn1(x)
@@ -167,15 +167,15 @@ class ResNet(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
 
-        #x = x.reshape([batch_size, 2048, 4, 33])
+        x = x.reshape([batch_size, 512, 4, 33])
 
         
 
         x = self.avgpool(x)
 
-        #x = x.transpose(2,3)
-        x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
-        x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
+        x = x.transpose(2,3)
+        #x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
+        #x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
 
         x, norm_att = self.attention(x)
 
