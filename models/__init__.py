@@ -5,10 +5,12 @@ from .resnet import *
 from .densenet import *
 from .resnext import *
 from .resnet50 import *
+from .resnet18_attention import *
+from .resnet50_attention import *
 
 available_models = [
     'vgg19_bn',
-    'resnet18', 'resnet34', 'resnet50', 'resnet101', 'resnet152',
+    'resnet18', 'resnet18_attetion', 'resnet50', 'resnet50_attetion',
     'wideresnet28_10', 'wideresnet28_10D', 'wideresnet52_10',
     'resnext29_8_64',
     'dpn92',
@@ -18,8 +20,12 @@ available_models = [
 def create_model(model_name, num_classes, in_channels):
     if model_name == "resnet18":
         model = resnet18(num_classes=num_classes, in_channels=in_channels)
+    elif model_name == "resnet18_attention":
+        model = resnet18_attention(num_classes=num_classes, in_channels=in_channels)
     elif model_name == "resnet50":
         model = resnet50(num_classes=num_classes, in_channels=in_channels)
+    elif model_name == "resnet50_attention":
+        model = resnet50_attention(num_classes=num_classes, in_channels=in_channels)
     elif model_name == "wideresnet28_10":
         model = WideResNet(depth=28, widen_factor=10, dropRate=0, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "wideresnet28_10D":

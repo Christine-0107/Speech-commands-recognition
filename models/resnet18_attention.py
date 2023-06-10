@@ -11,11 +11,11 @@ import torch.utils.model_zoo as model_zoo
 from models.HigherModels import *
 
 
-__all__ = ['ResNet', 'resnet50']
+__all__ = ['ResNet', 'resnet18_attention']
 
 
 model_urls = {
-    'resnet50': 'https://download.pytorch.org/models/resnet50-19c8e357.pth',
+    'resnet18': 'https://download.pytorch.org/models/resnet18-5c106cde.pth',
 }
 
 
@@ -98,7 +98,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, in_channels=3):
+    def __init__(self, block, layers, mode, num_classes=1000, in_channels=3):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
@@ -113,13 +113,15 @@ class ResNet(nn.Module):
         self.avgpool = nn.AvgPool2d(1, stride=1)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
+        if mode == 18:
+            dim = 512
         # add attention
         # attention pooling module
-        """self.attention = Attention(
+        self.attention = Attention(
             dim,
             num_classes,
             att_activation='sigmoid',
-            cla_activation='sigmoid')"""
+            cla_activation='sigmoid')
         #self.avgpool = nn.AvgPool2d((4, 1))
 
         for m in self.modules():
@@ -167,10 +169,10 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
 
         #x = x.transpose(2,3)
-        #x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
-        #x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
+        x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
+        x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
 
-        #x, norm_att = self.attention(x)
+        x, norm_att = self.attention(x)
 
         x = x.view(x.size(0), -1)
         x = self.fc(x)
@@ -178,13 +180,14 @@ class ResNet(nn.Module):
         return x
 
 
-def resnet50(pretrained=False, **kwargs):
-    """Constructs a ResNet-50 model.
+def resnet18_attention(pretrained=False, **kwargs):
+    """Constructs a ResNet-18 model.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    model = ResNet(BasicBlock, [2, 2, 2, 2], 18, **kwargs)
     if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
+        model.load_state_dict(model_zoo.load_url(model_urls['resnet18']))
     return model
+

@@ -11,7 +11,7 @@ import torch.utils.model_zoo as model_zoo
 from models.HigherModels import *
 
 
-__all__ = ['ResNet', 'resnet50']
+__all__ = ['ResNet', 'resnet50_attention']
 
 
 model_urls = {
@@ -98,7 +98,7 @@ class Bottleneck(nn.Module):
 
 class ResNet(nn.Module):
 
-    def __init__(self, block, layers, num_classes=1000, in_channels=3):
+    def __init__(self, block, layers, mode, num_classes=1000, in_channels=3):
         self.inplanes = 64
         super(ResNet, self).__init__()
         self.conv1 = nn.Conv2d(in_channels, 64, kernel_size=7, stride=2, padding=3,
@@ -113,13 +113,15 @@ class ResNet(nn.Module):
         self.avgpool = nn.AvgPool2d(1, stride=1)
         self.fc = nn.Linear(512 * block.expansion, num_classes)
 
+        if mode == 50:
+            dim = 2048
         # add attention
         # attention pooling module
-        """self.attention = Attention(
+        self.attention = Attention(
             dim,
             num_classes,
             att_activation='sigmoid',
-            cla_activation='sigmoid')"""
+            cla_activation='sigmoid')
         #self.avgpool = nn.AvgPool2d((4, 1))
 
         for m in self.modules():
@@ -167,10 +169,10 @@ class ResNet(nn.Module):
         x = self.avgpool(x)
 
         #x = x.transpose(2,3)
-        #x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
-        #x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
+        x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
+        x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
 
-        #x, norm_att = self.attention(x)
+        x, norm_att = self.attention(x)
 
         x = x.view(x.size(0), -1)
         x = self.fc(x)
@@ -178,13 +180,13 @@ class ResNet(nn.Module):
         return x
 
 
-def resnet50(pretrained=False, **kwargs):
+def resnet50_attention(pretrained=False, **kwargs):
     """Constructs a ResNet-50 model.
 
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = ResNet(Bottleneck, [3, 4, 6, 3], **kwargs)
+    model = ResNet(Bottleneck, [3, 4, 6, 3], 50, **kwargs)
     if pretrained:
         model.load_state_dict(model_zoo.load_url(model_urls['resnet50']))
     return model
