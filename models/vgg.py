@@ -40,6 +40,7 @@ class VGG(nn.Module):
 
     def forward(self, x):
         x = self.features(x)  # 根据输入的特征图进行一系列的卷积和池化操作，从而实现特征提取
+        print(f"x_shape: {x.shape}")
         x = x.view(x.size(0), -1)  # 展开成一维向量
         x = self.classifier(x)  # 特征向量输入进行分类的特征计算，最终的输出是一个大小为[batch_size, num_classes]的张量
         return x
