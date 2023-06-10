@@ -10,7 +10,7 @@ from .resnet50_attention import *
 
 available_models = [
     'vgg19_bn',
-    'resnet18', 'resnet18_attetion', 'resnet50', 'resnet50_attetion',
+    'resnet18', 'resnet18_attention', 'resnet50', 'resnet50_attention',
     'wideresnet28_10', 'wideresnet28_10D', 'wideresnet52_10',
     'resnext29_8_64',
     'dpn92',

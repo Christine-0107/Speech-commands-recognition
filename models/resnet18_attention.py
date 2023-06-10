@@ -119,7 +119,7 @@ class ResNet(nn.Module):
         # attention pooling module
         self.attention = Attention(
             dim,
-            num_classes,
+            dim,
             att_activation='sigmoid',
             cla_activation='sigmoid')
         #self.avgpool = nn.AvgPool2d((4, 1))
@@ -167,13 +167,14 @@ class ResNet(nn.Module):
         
 
         x = self.avgpool(x)
+        
 
         #x = x.transpose(2,3)
-        x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
-        x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
+        #x = torch.unsqueeze(x, -1)  # 在最后一个维度上添加一个维度
+        #x = torch.unsqueeze(x, -1)  # 在新添加的维度上再添加一个维度
 
         x, norm_att = self.attention(x)
-
+        
         x = x.view(x.size(0), -1)
         x = self.fc(x)
 
