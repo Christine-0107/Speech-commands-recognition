@@ -11,19 +11,12 @@ import math
 
 
 __all__ = [
-    'VGG', 'vgg11', 'vgg11_bn', 'vgg13', 'vgg13_bn', 'vgg16', 'vgg16_bn',
-    'vgg19_bn', 'vgg19',
+    'VGG', 'vgg19_bn', 'vgg19',
 ]
 
 
 model_urls = {
-    'vgg11': 'https://download.pytorch.org/models/vgg11-bbd30ac9.pth',
-    'vgg13': 'https://download.pytorch.org/models/vgg13-c768596a.pth',
-    'vgg16': 'https://download.pytorch.org/models/vgg16-397923af.pth',
     'vgg19': 'https://download.pytorch.org/models/vgg19-dcbb9e9d.pth',
-    'vgg11_bn': 'https://download.pytorch.org/models/vgg11_bn-6002323d.pth',
-    'vgg13_bn': 'https://download.pytorch.org/models/vgg13_bn-abd245e5.pth',
-    'vgg16_bn': 'https://download.pytorch.org/models/vgg16_bn-6c64b313.pth',
     'vgg19_bn': 'https://download.pytorch.org/models/vgg19_bn-c79401a0.pth',
 }
 
@@ -46,9 +39,9 @@ class VGG(nn.Module):
             self._initialize_weights()
 
     def forward(self, x):
-        x = self.features(x)
-        x = x.view(x.size(0), -1)
-        x = self.classifier(x)
+        x = self.features(x)  # 根据输入的特征图进行一系列的卷积和池化操作，从而实现特征提取
+        x = x.view(x.size(0), -1)  # 展开成一维向量
+        x = self.classifier(x)  # 特征向量输入进行分类的特征计算，最终的输出是一个大小为[batch_size, num_classes]的张量
         return x
 
     def _initialize_weights(self):
@@ -87,90 +80,6 @@ cfg = {
     'D': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 'M', 512, 512, 512, 'M', 512, 512, 512, 'M'],
     'E': [64, 64, 'M', 128, 128, 'M', 256, 256, 256, 256, 'M', 512, 512, 512, 512, 'M', 512, 512, 512, 512, 'M'],
 }
-
-
-def vgg11(pretrained=False, in_channels=3, **kwargs):
-    """VGG 11-layer model (configuration "A")
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['A'], in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg11']))
-    return model
-
-
-def vgg11_bn(pretrained=False, in_channels=3, **kwargs):
-    """VGG 11-layer model (configuration "A") with batch normalization
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['A'], batch_norm=True, in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg11_bn']))
-    return model
-
-
-def vgg13(pretrained=False, in_channels=3, **kwargs):
-    """VGG 13-layer model (configuration "B")
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['B'], in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg13']))
-    return model
-
-
-def vgg13_bn(pretrained=False, in_channels=3, **kwargs):
-    """VGG 13-layer model (configuration "B") with batch normalization
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['B'], batch_norm=True, in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg13_bn']))
-    return model
-
-
-def vgg16(pretrained=False, in_channels=3, **kwargs):
-    """VGG 16-layer model (configuration "D")
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['D'], in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16']))
-    return model
-
-
-def vgg16_bn(pretrained=False, in_channels=3, **kwargs):
-    """VGG 16-layer model (configuration "D") with batch normalization
-
-    Args:
-        pretrained (bool): If True, returns a model pre-trained on ImageNet
-    """
-    if pretrained:
-        kwargs['init_weights'] = False
-    model = VGG(make_layers(cfg['D'], batch_norm=True, in_channels=in_channels), **kwargs)
-    if pretrained:
-        model.load_state_dict(model_zoo.load_url(model_urls['vgg16_bn']))
-    return model
 
 
 def vgg19(pretrained=False, in_channels=3, **kwargs):
