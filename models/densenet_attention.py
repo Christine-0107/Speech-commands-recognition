@@ -80,11 +80,11 @@ class Transition(nn.Module):
         return out
 
 
-class DenseNet(nn.Module):
+class DenseNet_A(nn.Module):
 
     def __init__(self, depth=22, block=Bottleneck,
         dropRate=0, num_classes=10, growthRate=12, compressionRate=2, in_channels=3):
-        super(DenseNet, self).__init__()
+        super(DenseNet_A, self).__init__()
 
         assert (depth - 4) % 3 == 0, 'depth should be 3n+4'
         n = (depth - 4) / 3 if block == BasicBlock else (depth - 4) // 6

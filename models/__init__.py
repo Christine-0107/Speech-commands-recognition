@@ -9,6 +9,9 @@ from .resnet18_attention import *
 from .resnet50_attention import *
 from .vgg_attention import *
 from .densenet_attention import *
+from .densenet_attention import DenseNet_A
+from .resnext_attention import *
+from .resnext_attention import CifarResNeXt_A
 
 available_models = [
     'vgg19_bn', 'vgg19_bn_attention',
@@ -36,12 +39,14 @@ def create_model(model_name, num_classes, in_channels):
         model = WideResNet(depth=52, widen_factor=10, dropRate=0, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "resnext29_8_64":
         model = CifarResNeXt(nlabels=num_classes, in_channels=in_channels)
+    elif model_name == "resnext29_8_64":
+        model = CifarResNeXt_A(nlabels=num_classes, in_channels=in_channels)
     elif model_name == "dpn92":
         model = DPN92(num_classes=num_classes, in_channels=in_channels)
     elif model_name == "densenet_bc_100_12":
         model = DenseNet(depth=100, growthRate=12, compressionRate=2, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "densenet_bc_100_12_attention":
-        model = DenseNet(depth=100, growthRate=12, compressionRate=2, num_classes=num_classes, in_channels=in_channels)
+        model = DenseNet_A(depth=100, growthRate=12, compressionRate=2, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "densenet_bc_250_24":
         model = DenseNet(depth=250, growthRate=24, compressionRate=2, num_classes=num_classes, in_channels=in_channels)
     elif model_name == "densenet_bc_190_40":
