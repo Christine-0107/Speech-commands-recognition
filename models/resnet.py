@@ -174,7 +174,7 @@ class ResNet(nn.Module):
         #x, norm_att = self.attention(x)
 
         x = x.view(x.size(0), -1)
-        print(f"x_shape: {x.shape}")
+        #print(f"x_shape: {x.shape}")
         x = self.fc(x)
 
         return x
